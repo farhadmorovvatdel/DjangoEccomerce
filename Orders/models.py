@@ -20,18 +20,24 @@ class Item(models.Model):
     label=models.CharField(choices=LABEL_CHOICES,max_length=20,default="Su")
     slug=models.SlugField()
     description=models.TextField(null=True,blank=True)
+    quantity=models.IntegerField(default=1)
     def __str__(self):
         return self.title
     def get_asbolute_url(self):
         return  reverse('Orders:ItemDetailPage',kwargs={
             'slug':self.slug
         })
+    def get_add_to_cart_url(self):
+        return  reverse("Orders:add-to-cart",kwargs={
+            'slug':self.slug
+        })
 
 class OrderItem(models.Model):
     item=models.ForeignKey(Item,on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
 
     def __str__(self):
-        return self.title
+        return self.item.title
 
 
 class Order(models.Model):
