@@ -31,6 +31,10 @@ class Item(models.Model):
         return  reverse("Orders:add-to-cart",kwargs={
             'slug':self.slug
         })
+    def remove_from_cart_url(self):
+        return reverse('Orders:remove-from-cart',kwargs={
+            'slug':self.slug
+        })
 
 class OrderItem(models.Model):
     item=models.ForeignKey(Item,on_delete=models.CASCADE)
