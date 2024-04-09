@@ -1,8 +1,8 @@
 $(document).ready(function() {
     $("#add-to-cart-btn").click(function(e) {
-        e.preventDefault(); // Prevent default anchor behavior
-        var addToCartUrl = $(this).data('url'); // Get the URL from data-url attribute
-        var slug = $(this).data('slug'); // Get the slug from data-slug attribute
+        e.preventDefault();
+        var addToCartUrl = $(this).data('url');
+        var slug = $(this).data('slug');
         $.ajax({
             type: "GET",
             url: addToCartUrl,
@@ -26,6 +26,45 @@ $(document).ready(function() {
         });
     });
 });
+
+
+
+$(document).ready(function() {
+    $("#remove-from-cart").click(function(e) {
+        e.preventDefault();
+        var RemovefromCartUrl = $(this).data('url');
+        var slug = $(this).data('slug');
+        $.ajax({
+            type: "GET",
+            url: RemovefromCartUrl,
+            data: { slug: slug },
+            success: function(res) {
+               if (res.response === 'remove') {
+                   Swal.fire({
+                   icon: 'success',
+                   title: 'Success',
+                   text: 'Your Item Remove the Cart'
+                });
+               }
+               // else if(res.response ==='success'){
+               //     Swal.fire({
+               //     icon: 'success',
+               //     title: 'Success',
+               //     text: 'Item Was Add to Your Cart!'
+               //  });
+               // }
+            },
+        });
+    });
+});
+
+
+
+
+
+
+
+
 
 // $(document).ready(function(){
 //     $("#add-to-cart-btn").click(function(e){
