@@ -46,13 +46,13 @@ $(document).ready(function() {
                    text: 'Your Item Remove the Cart'
                 });
                }
-               // else if(res.response ==='success'){
-               //     Swal.fire({
-               //     icon: 'success',
-               //     title: 'Success',
-               //     text: 'Item Was Add to Your Cart!'
-               //  });
-               // }
+               else if(res.response ==='empty'){
+                   Swal.fire({
+                   icon: 'success',
+                   title: 'Success',
+                   text: 'You Dont have active Cart!'
+                });
+               }
             },
         });
     });
