@@ -1,0 +1,87 @@
+{#{% extends "account/base_entrance.html" %}#}
+{% extends 'Base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+{% load allauth account %}
+{% block head_title %}
+    {% trans "Sign In" %}
+{% endblock head_title %}
+
+{#{% block content %}#}
+    {% element h1 %}
+        {% trans "Sign In" %}
+    {% endelement %}
+{% block content %}
+    </p>
+
+    {% url 'account_login' as login_url %}
+
+    <div style="margin-left: 300px;">
+          <h2> Sign In</h2>
+   {% element form form=form method="post" action=login_url tags="entrance,login" %}
+        {% slot body %}
+            {% csrf_token %}
+{#            {% element fields form=form unlabeled=True %}#}
+{#            {% endelement %}#}
+              {{ form|crispy}}
+
+            {% if redirect_field_value %}
+                <input type="hidden"
+                       name="{{ redirect_field_name }}"
+                       value="{{ redirect_field_value }}" />
+            {% endif %}
+        {% endslot %}
+        {% slot actions %}
+            <button type="submit" class="btn btn-success btn-lg">{% trans "Sign In" %}</button>
+{#            {% element button type="submit"  tags="prominent,login" %}#}
+{#            {% endelement %}#}
+        {% endslot %}
+    {% endelement %}
+    </div>
+    {% if SOCIALACCOUNT_ENABLED %}
+        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+    {% endif %}
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+{##}
+{#<link rel="stylesheet" href="{% static '/css/custom.css' %}">#}
+{#<div class="container">#}
+{#<p>#}
+{#        {% blocktrans %}If you have not created an account yet, then please#}
+{#    <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}#}
+{#      <form action="{% url 'account_login' %}" method="post">#}
+{#          {% csrf_token %}#}
+{#        <div class="title">Sign in</div>#}
+{#        <div class="input-box underline">#}
+{#          <input type="text" placeholder="Enter Your Email" required>#}
+{#          <div class="underline"></div>#}
+{#        </div>#}
+{#        <div class="input-box">#}
+{#          <input type="password" placeholder="Enter Your Password" required>#}
+{#          <div class="underline"></div>#}
+{#        </div>#}
+{#        <div class="input-box button">#}
+{#          <input type="submit" name="" value="Continue">#}
+{#        </div>#}
+{#      </form>#}
+{#        <div class="option">or Connect With Social Media</div>#}
+{#        <div class="twitter">#}
+{#          <a href="#"><i class="fab fa-twitter"></i>Sign in With Twitter</a>#}
+{#        </div>#}
+{#        <div class="facebook">#}
+{#          <a href="#"><i class="fab fa-facebook-f"></i>Sign in With Facebook</a>#}
+{#        </div>#}
+{#</div>#}
+{#{% endblock %}#}
