@@ -7,6 +7,7 @@ from django.contrib import messages
 
 class HomeListView(ListView):
     model = Item
+    paginate_by = 1
     template_name = 'Home_page.html'
 
 class ItemDetailView(DetailView):
@@ -44,17 +45,18 @@ def Add_to_Cart(request,slug):
 def Remove_from_cart(request,slug):
     item=get_object_or_404(Item,slug=slug)
     order_qs=Order.objects.filter(user=request.user,ordered=False)
-    print(order_qs)
+
     if order_qs.exists():
         order=order_qs[0]
         if order.items.filter(item__slug=item.slug).exists():
             order_item=OrderItem.objects.filter(item=item,user=request.user,ordered=False)[0]
-            print(order_item)
             order.items.remove(order_item)
-            messages.info(request, 'this item was remove your cart')
-
+            return JsonResponse({
+                'response':'remove'
+            })
         else:
-            return redirect('Orders:ItemDetailPage', slug=slug)
+            return JsonResponse({
+                'response': 'empty'
+            })
     else:
         return  redirect('Orders:ItemDetailPage',slug=slug)
-    return redirect('Orders:ItemDetailPage', slug=slug)
