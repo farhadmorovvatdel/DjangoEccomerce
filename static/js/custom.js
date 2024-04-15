@@ -1,3 +1,5 @@
+
+
 $(document).ready(function() {
        $("#add-to-cart-btn").click(function(e) {
         e.preventDefault();
@@ -24,6 +26,7 @@ $(document).ready(function() {
                             text: 'Item Was Added to Your Cart!'
                         });
                     }
+                    updateCartItemCount()
                 },
             });
         } else {
@@ -36,7 +39,23 @@ $(document).ready(function() {
                 $(location).attr('href', '/accounts/login/');
             });
         }
-    });
+
+    updateCartItemCount();
+    function updateCartItemCount() {
+        $.ajax({
+            url: '/cart-item-count/',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                $('#badge-item').text(data.item_count);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching cart item count:', error);
+            }
+        });
+    }
+});
+
 });
 
 
@@ -59,6 +78,7 @@ $(document).ready(function() {
                             title: 'Success',
                             text: 'Your Item Remove the Cart'
                         });
+                        updateCartItemCount()
                     } else if (res.response === 'empty') {
                         Swal.fire({
                             icon: 'success',
@@ -79,6 +99,20 @@ $(document).ready(function() {
                 $(location).attr('href', '/accounts/login/');
             });
         }
+     updateCartItemCount();
+    function updateCartItemCount() {
+        $.ajax({
+            url: '/cart-item-count/',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                $('#badge-item').text(data.item_count);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching cart item count:', error);
+            }
+        });
+    }
     });
 });
 
