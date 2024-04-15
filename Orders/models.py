@@ -44,6 +44,12 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return self.item.title
+    def get_total_item_price(self):
+        return self.quantity * self.item.price
+
+
+    def get_total_discount_item_price(self):
+        return  self.quantity * self.item.discount_price
 
 
 class Order(models.Model):
