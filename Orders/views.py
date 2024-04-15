@@ -53,11 +53,11 @@ def Add_to_Cart(request,slug):
 
 
 def Header(request):
-    qs = Order.objects.filter(user=request.user,ordered=False)
-    item_count=qs.first().items.count
-
-    return render(request,'header.html',{'item_count':item_count})
-
+    if request.user.is_authenticated:
+      qs = Order.objects.filter(user=request.user,ordered=False)
+      item_count=qs.first().items.count
+      return render(request,'header.html',{'item_count':item_count})
+    return  render(request,'header.html')
 
 @login_required(redirect_field_name=None)
 def Remove_from_cart(request,slug):
