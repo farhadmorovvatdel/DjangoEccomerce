@@ -1,8 +1,9 @@
 
 {% load static %}
+{% load render_partial %}
 <!DOCTYPE html>
 <html lang="en">
-{% include 'header.html' %}
+{% render_partial 'Orders.views.Header' %}
 <body>
 {% block content %}
     <div class="mt-4">
