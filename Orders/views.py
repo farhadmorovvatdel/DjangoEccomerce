@@ -52,6 +52,13 @@ def Add_to_Cart(request,slug):
 
 
 
+def Header(request):
+    qs = Order.objects.filter(user=request.user,ordered=False)
+    item_count=qs.first().items.count
+
+    return render(request,'header.html',{'item_count':item_count})
+
+
 @login_required(redirect_field_name=None)
 def Remove_from_cart(request,slug):
     item=get_object_or_404(Item,slug=slug)
@@ -81,3 +88,13 @@ class Order_Summary(LoginRequiredMixin,View):
 
             return  redirect('Orders:HomePage')
 
+def cart_item_count(request):
+    qs = Order.objects.filter(user=request.user, ordered=False)
+    if qs.exists():
+        item_count= qs.first().items.count()
+        return  JsonResponse({
+            'item_count':item_count
+        })
+    return JsonResponse({
+        'item_count':0
+    })
