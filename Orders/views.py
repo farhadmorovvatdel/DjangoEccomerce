@@ -23,7 +23,7 @@ class ItemDetailView(DetailView):
         return context
 
 
-@login_required(redirect_field_name=None,login_url='account_login')
+@login_required(redirect_field_name=None)
 def Add_to_Cart(request,slug):
         item=get_object_or_404(Item,slug=slug)
         order_item,created=OrderItem.objects.get_or_create(item=item,user=request.user,ordered=False)
