@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-r7ae1stG4ZJXg61Wm8u6/1bZBh5xC3DlPPp7lGQmz3t0mdeK5roq4JOpv+oG4/QF" crossorigin="anonymous">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
@@ -75,14 +77,13 @@
             </div>
              {% if request.user.is_authenticated %}
             <div class="col-lg-3 col-6 text-right">
-                <a href="" class="btn border">
+                 <a href="" class="btn border">
                     <i class="fas fa-heart text-primary"></i>
                     <span class="badge">0</span>
                 </a>
-                <a href="" class="btn border">
+                <a href="{% url 'Orders:OrderSummary' %}" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
-                    <span class="badge" id="badge-item">{{ item_count }}</span>
-{#                    <span class="badge" id="badge-item">{{ request.user|Cart_Item_Count }}</span>#}
+                     <span class="badge" id="badge-item">{{ item_count }}</span>
                 </a>
 
             </div>
