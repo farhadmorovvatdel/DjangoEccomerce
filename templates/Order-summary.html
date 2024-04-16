@@ -14,6 +14,7 @@
                             <th>Quantity</th>
                             <th>Total Item Price</th>
                             <th>Remove</th>
+                            <th>SavingAmount</th>
                         </tr>
 
                     </thead>
@@ -21,25 +22,38 @@
                     {% for order_item in object.items.all %}
                         <tr>
 
+
                             <td class="align-middle"><img src="img/product-1.jpg" alt="" style="width: 50px;"> {{ order_item.item.title}}</td>
-                            <td class="align-middle">{{ order_item.item.price }}</td>
-                            <td class="align-middle">
-                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-minus" >
-                                        <i class="fa fa-minus"></i>
-                                        </button>
-                                    </div>
-                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="1">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-plus">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                            {% if order_item.item.discount_price %}
+                            <td class="align-middle">{{ order_item.item.discount_price }}</td>
+                            {% else %}
+                              <td class="align-middle">{{ order_item.item.price }}</td>
+                            {% endif %}
+                            <td class="align-middle">{{ order_item.quantity }}
+{#                                <div class="input-group quantity mx-auto" style="width: 100px;">#}
+{#                                    <div class="input-group-btn">#}
+{#                                        <button class="btn btn-sm btn-primary btn-minus" >#}
+{#                                        <i class="fa fa-minus"></i>#}
+{#                                        </button>#}
+{#                                    </div>#}
+{#                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="1">#}
+{#                                    <div class="input-group-btn">#}
+{#                                        <button class="btn btn-sm btn-primary btn-plus">#}
+{#                                            <i class="fa fa-plus"></i>#}
+{#                                        </button>#}
+{#                                    </div>#}
+{#                                </div>#}
                             </td>
-                            <td class="align-middle">{{ order_item.price }}</td>
-                            <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td>
+                           {% if order_item.item.price %}
+                            <td class="align-middle">{{ order_item.get_total_item_price }}</td>
+                           {% else %}
+                              <td class="align-middle">{{ order_item.get_total_discount_item_price }}</td>
+                        {% endif %}
+                            <td class="align-middle">
+                                <a class="btn btn-sm btn-primary"><i class="fa fa-times"></i>
+                                </a></td>
+                        <td class="align-middle bg bg-warning text-white"> ${{ order_item.get_amount_save }} </td>
+
                         </tr>
                        {% endfor %}
                     </tbody>
