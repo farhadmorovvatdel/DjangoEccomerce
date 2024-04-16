@@ -6,7 +6,7 @@ from .models import Item,OrderItem,Order
 from django.utils import  timezone
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-from .decorators import custom_login_required
+
 
 class HomeListView(ListView):
     model = Item
@@ -49,14 +49,14 @@ def Add_to_Cart(request,slug):
                'response': 'success'
           })
 
-
-
-
 def Header(request):
     if request.user.is_authenticated:
       qs = Order.objects.filter(user=request.user,ordered=False)
-      item_count=qs.first().items.count
-      return render(request,'header.html',{'item_count':item_count})
+      if qs.exists():
+        item_count=qs.first().items.count()
+        return render(request,'header.html',{'item_count':item_count})
+      else:
+          return render(request,'header.html',{'item_count':0})
     return  render(request,'header.html')
 
 @login_required(redirect_field_name=None)
@@ -88,6 +88,7 @@ class Order_Summary(LoginRequiredMixin,View):
 
             return  redirect('Orders:HomePage')
 
+@login_required(redirect_field_name=None)
 def cart_item_count(request):
     qs = Order.objects.filter(user=request.user, ordered=False)
     if qs.exists():
@@ -98,3 +99,17 @@ def cart_item_count(request):
     return JsonResponse({
         'item_count':0
     })
+
+def Faviorate_Item(request,id):
+    item_id=str(id)
+    faviorated_items=request.session.get('faviorated_items',[])
+    if item_id in faviorated_items:
+        faviorated_items.remove(item_id)
+        faviorate=False
+    else:
+        faviorated_items.append(item_id)
+        faviorate=True
+    request.session['faviorated_items'] = faviorated_items
+    request.session.modified = True
+
+    return JsonResponse({'faviorate':faviorate})
