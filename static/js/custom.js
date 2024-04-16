@@ -1,5 +1,4 @@
 
-
 $(document).ready(function() {
        $("#add-to-cart-btn").click(function(e) {
         e.preventDefault();
@@ -49,16 +48,11 @@ $(document).ready(function() {
             success: function(data) {
                 $('#badge-item').text(data.item_count);
             },
-            error: function(xhr, status, error) {
-                console.error('Error fetching cart item count:', error);
-            }
         });
     }
 });
 
 });
-
-
 
 $(document).ready(function() {
     $("#remove-from-cart").click(function(e) {
@@ -82,7 +76,7 @@ $(document).ready(function() {
                     } else if (res.response === 'empty') {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Success',
+                            title: 'success',
                             text: 'You Dont have active Cart!'
                         });
                     }
@@ -107,20 +101,52 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(data) {
                 $('#badge-item').text(data.item_count);
+               // we can the icon for sales bring the body and the show with badg.text in here
+               //  sales icon at header
+
             },
-            error: function(xhr, status, error) {
-                console.error('Error fetching cart item count:', error);
-            }
+
         });
     }
     });
 });
 
+// $(document).ready(function() {
+//     $('.faviorate-btn').click(function() {
+//         var itemid = $(this).data('item-id');
+//         $.ajax({
+//             type: 'GET',
+//             url: '/faviorate-item/' + itemid  ,
+//             success: function(res) {
+//                 if (res.faviorate === true) {
+//
+//                     // $('.faviorate-btn').css('background-color','red')
+//                     console.log('faviorate')
+//                 } else {
+//                 //    $('.faviorate-btn').css('background-color','blue')
+//                     console.log('not faviorate')
+//                 }
+//             }
+//         });
+//     });
+// });
 
 
+$(document).ready(function() {
+    $('#faviorate-btn').click(function() {
+        var itemid = $(this).data('item-id');
+        $.get('/faviorate-item/' + itemid).then(function (res){
+            if (res.faviorate === true) {
+                $('#faviorate-btn').css('background-color','brown')
+                $('#faviorate-btn').text('Unfavorite');
+                console.log('favored');
 
-
-
-
+            } else {
+                $('#faviorate-btn').css('background-color','black')
+                $('#faviorate-btn').text('favorite');
+            }
+        });
+    });
+});
 
 
