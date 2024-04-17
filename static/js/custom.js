@@ -149,4 +149,48 @@ $(document).ready(function() {
     });
 });
 
+$(document).ready(function(){
+    $('#cart-plus').on('click',function (event){
+        event.preventDefault();
+        var slug=$(this).data('slug');
+        $.get('/add-single-item-to-cart/' + slug ).then(function (res){
+            if(res.response === 'success'){
+                var plus= parseInt($('#input-id').val())
+                var newplus=plus +1
+                $('#input-id').val(newplus)
+                $(location).attr('href', '/order-summary/');
 
+            }
+        })
+    })
+})
+
+
+
+$(document).ready(function(){
+    $('#cart-mines').on('click',function (event){
+        event.preventDefault();
+        var slug=$(this).data('slug');
+        $.get('/remove-single-item-from-cart/' + slug ).then(function (res){
+            if(res.response === 'remove'){
+                 var mines=$('#input-id').val()
+                 var newmines=mines -1
+                 $('#input-id').val(newmines)
+                 $(location).attr('href', '/order-summary/');
+            }
+        })
+
+        })
+})
+
+$(document).ready(function (){
+    $('#remove-cart-summary').click(function (event){
+        event.preventDefault();
+        var slug= $(this).data('slug')
+        $.get('/remove-from-cart/' + slug).then(function (res){
+            if(res.response ==='remove'){
+                $(location).attr('href', '/order-summary/');
+            }
+        })
+    })
+})
