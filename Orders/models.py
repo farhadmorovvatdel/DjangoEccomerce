@@ -20,7 +20,7 @@ class Item(models.Model):
     label=models.CharField(choices=LABEL_CHOICES,max_length=20,default="Su")
     slug=models.SlugField()
     description=models.TextField(null=True,blank=True)
-    quantity=models.IntegerField(default=1)
+    quantity=models.PositiveIntegerField(default=1)
     def __str__(self):
         return self.title
     def get_asbolute_url(self):
@@ -38,7 +38,7 @@ class Item(models.Model):
 
 class OrderItem(models.Model):
     item=models.ForeignKey(Item,on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.PositiveIntegerField(default=1)
     ordered = models.BooleanField(default=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -54,6 +54,11 @@ class OrderItem(models.Model):
     def get_amount_save(self):
         return (self.get_total_item_price() - self.get_total_discount_item_price())
 
+    def get_final_price(self):
+        if self.item.discount_price:
+            return self.get_total_discount_item_price()
+        return self.get_total_item_price()
+
 
 class Order(models.Model):
     user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
@@ -61,8 +66,12 @@ class Order(models.Model):
     start_date=models.DateTimeField(auto_now_add=True)
     orderd_date=models.DateTimeField()
     ordered = models.BooleanField(default=False)
-
-    
     def __str__(self):
         return self.user.username
+
+    def get_total(self):
+        total=0
+        for order_item in self.items.all():
+            total+=order_item.get_final_price()
+        return  total
        
