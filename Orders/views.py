@@ -113,3 +113,38 @@ def Faviorate_Item(request,id):
     request.session.modified = True
 
     return JsonResponse({'faviorate':faviorate})
+
+
+
+@login_required(redirect_field_name=None)
+def Remove_single_item_from_cart(request,slug):
+    item=get_object_or_404(Item,slug=slug)
+    order_qs=Order.objects.filter(user=request.user,ordered=False)
+    if order_qs.exists():
+        order=order_qs[0]
+        if order.items.filter(item__slug=item.slug).exists():
+            order_item=OrderItem.objects.filter(item=item,user=request.user,ordered=False)[0]
+            order_item.quantity -=1
+            order_item.save()
+            return JsonResponse({
+                'response':'remove'
+            })
+        else:
+            return JsonResponse({
+                'response': 'empty'
+            })
+    return JsonResponse({
+        'response':'empty'
+    })
+
+@login_required(redirect_field_name=None)
+def add_single_item_cart(request,slug):
+    item=get_object_or_404(Item,slug=slug)
+    order=Order.objects.filter(user=request.user,ordered=False)
+    if order.exists():
+       order_item=OrderItem.objects.filter(item=item,user=request.user,ordered=False).first()
+       order_item.quantity+=1
+       order_item.save()
+       return JsonResponse({'response':'success'})
+    else:
+        return  JsonResponse({'response':'empty'})
