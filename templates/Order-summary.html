@@ -47,19 +47,27 @@
                             </td>
                            {% if order_item.item.price %}
                             <td class="align-middle" id="get-total-price">{{ order_item.get_total_item_price }}</td>
-                           {% else %}
+                           {% elif order_item.item.discount_price != 0 %}
                               <td class="align-middle">{{ order_item.get_total_discount_item_price }}</td>
+                           {% else %}
+                                 <td class="align-middle">{{ order_item.get_total_item_price }}</td>
                         {% endif %}
                             <td class="align-middle">
                                 <a class="btn btn-sm btn-primary" id="remove-cart-summary" data-slug="{{ order_item.item.slug }}"><i class="fa fa-times"></i>
                                 </a></td>
-                        <td class="align-middle bg bg-warning text-white"> ${{ order_item.get_amount_save }} </td>
-
+                        {% if order_item.item.discount_price == 0 %}
+                            <td class="align-middle bg bg-warning text-white" id='save-amount'> 0$ </td>
+                        {% elif order_item.item.discount_price != 0 %}
+                      <td class="align-middle bg bg-warning text-white" id='save-amount'> ${{ order_item.get_amount_save }} </td>
+                            {% elif order_item.item.price %}
+                             <td class="align-middle bg bg-warning text-white" id='save-amount'> 0$ </td>
                         </tr>
+                        {% endif %}
+
                        {% endfor %}
                    <tr>
                     <td colspan="4">Order Total</td>
-                    <td colspan="4">{{ object.get_total }}</td>
+                    <td colspan="4" id="order-total-price">{{ object.get_total }}</td>
                    </tr>
                     {% if object.get_total  %}
                     <tr>
