@@ -68,8 +68,10 @@ def Remove_from_cart(request,slug):
         if order.items.filter(item__slug=item.slug).exists():
             order_item=OrderItem.objects.filter(item=item,user=request.user,ordered=False)[0]
             order.items.remove(order_item)
+
             return JsonResponse({
-                'response':'remove'
+                'response':'remove',
+
             })
         else:
             return JsonResponse({
@@ -124,10 +126,21 @@ def Remove_single_item_from_cart(request,slug):
         order=order_qs[0]
         if order.items.filter(item__slug=item.slug).exists():
             order_item=OrderItem.objects.filter(item=item,user=request.user,ordered=False)[0]
+            print(order_item)
             order_item.quantity -=1
             order_item.save()
+            save_amount=order_item.get_amount_save()
+            print(save_amount)
+            final_price=order_item.get_final_price()
+            order_total=order_qs.first().get_total()
+            print(order_total)
+
             return JsonResponse({
-                'response':'remove'
+                'response':'remove',
+                'quantity':order_item.quantity,
+                'save_amount':save_amount,
+                'final_price':final_price,
+                'order_total':order_total
             })
         else:
             return JsonResponse({
