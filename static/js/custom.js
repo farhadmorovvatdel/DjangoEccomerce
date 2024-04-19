@@ -46,7 +46,8 @@ $(document).ready(function() {
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-                $('#badge-item').text(data.item_count);
+
+                $('#badge-item').text(data.item_count)
             },
         });
     }
@@ -73,12 +74,16 @@ $(document).ready(function() {
                             text: 'Your Item Remove the Cart'
                         });
                         updateCartItemCount()
-                    } else if (res.response === 'empty') {
+
+                    } else if (res.response === 'empty')
+
+                    {
                         Swal.fire({
                             icon: 'success',
                             title: 'success',
                             text: 'You Dont have active Cart!'
                         });
+
                     }
 
                 },
@@ -100,10 +105,7 @@ $(document).ready(function() {
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-                $('#badge-item').text(data.item_count);
-               // we can the icon for sales bring the body and the show with badg.text in here
-               //  sales icon at header
-
+                $('#badge-item').text(data.item_count)
             },
 
         });
@@ -166,17 +168,19 @@ $(document).ready(function(){
 })
 
 
-
 $(document).ready(function(){
     $('#cart-mines').on('click',function (event){
         event.preventDefault();
         var slug=$(this).data('slug');
-        $.get('/remove-single-item-from-cart/' + slug ).then(function (res){
+        $.get('/remove-single-item-from-cart/' + slug ).then(function(res){
             if(res.response === 'remove'){
-                 var mines=$('#input-id').val()
-                 var newmines=mines -1
-                 $('#input-id').val(newmines)
-                 $(location).attr('href', '/order-summary/');
+                 $('#input-id').val(res.quantity)
+
+                 $('#save-amount').text(res.save_amount)
+                 $('#get-total-price').text(res.final_price)
+                 console.log($('#order-total-price').text(res.order_total))
+                 
+                
             }
         })
 
