@@ -157,10 +157,10 @@ $(document).ready(function(){
         var slug=$(this).data('slug');
         $.get('/add-single-item-to-cart/' + slug ).then(function (res){
             if(res.response === 'success'){
-                var plus= parseInt($('#input-id').val())
-                var newplus=plus +1
-                $('#input-id').val(newplus)
-                $(location).attr('href', '/order-summary/');
+                $('#input-id').val(res.quantity)
+                 $('#save-amount').text( '$'+res.save_amount )
+                 $('#get-total-price').text(res.final_price)
+                 console.log($('#order-total-price').text(res.order_total))
 
             }
         })
@@ -175,11 +175,9 @@ $(document).ready(function(){
         $.get('/remove-single-item-from-cart/' + slug ).then(function(res){
             if(res.response === 'remove'){
                  $('#input-id').val(res.quantity)
-
-                 $('#save-amount').text(res.save_amount)
+                 $('#save-amount').text( '$'+res.save_amount )
                  $('#get-total-price').text(res.final_price)
                  console.log($('#order-total-price').text(res.order_total))
-                 
                 
             }
         })
