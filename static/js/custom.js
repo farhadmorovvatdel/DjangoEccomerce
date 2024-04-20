@@ -191,7 +191,12 @@ $(document).ready(function (){
         var slug= $(this).data('slug')
         $.get('/remove-from-cart/' + slug).then(function (res){
             if(res.response ==='remove'){
-                $(location).attr('href', '/order-summary/');
+            window.location.href ='/order-summary/'
+                // $.get('/order-summary/', function(newPageContent) {
+                //
+                //     $('#tbody').html(newPageContent);
+                // });
+
             }
         })
     })
