@@ -181,6 +181,9 @@ def add_single_item_cart(request,slug):
 
 class CheckOutView(LoginRequiredMixin,View):
     def get(self,*args,**kwargs):
+        order=Order.objects.filter(user=self.request.user ,ordered=False).first()
+        if order.items.count()==0:
+            return redirect('Orders:HomePage')
         form = CheckOutForm()
         return  render(self.request,'orders/CheckOut.html',{'form':form})
 
