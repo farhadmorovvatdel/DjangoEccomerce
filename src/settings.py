@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'Orders',
     'crispy_forms',
     'crispy_bootstrap4',
-    'django_render_partial'
+    'django_render_partial',
+    'django_countries',
 ]
 
 MIDDLEWARE = [
