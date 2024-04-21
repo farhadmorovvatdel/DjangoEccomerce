@@ -2,11 +2,11 @@ from django.contrib.auth.decorators import login_required
 from  django.contrib.auth .mixins import LoginRequiredMixin
 from django.shortcuts import render,get_object_or_404,redirect
 from django.views.generic import  ListView,DetailView,View
-from .models import Item,OrderItem,Order
+from .models import Item,OrderItem,Order,BilldingAddress
 from django.utils import  timezone
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-
+from .forms import CheckOutForm
 
 class HomeListView(ListView):
     model = Item
@@ -14,7 +14,7 @@ class HomeListView(ListView):
     template_name = 'Home_page.html'
 
 class ItemDetailView(DetailView):
-    template_name = 'Product.html'
+    template_name = 'orders/Product.html'
     model = Item
     def get_context_data(self,**kwargs):
         request=self.request
@@ -72,6 +72,7 @@ def Remove_from_cart(request,slug):
             return JsonResponse({
                 'response':'remove',
 
+
             })
         else:
             return JsonResponse({
@@ -85,7 +86,7 @@ class Order_Summary(LoginRequiredMixin,View):
     def get(self,*args,**kwargs):
         try:
           order=Order.objects.get(user=self.request.user,ordered=False)
-          return  render(self.request,'Order-summary.html',{'object':order})
+          return  render(self.request, 'orders/Order-summary.html', {'object':order})
         except ObjectDoesNotExist:
 
             return  redirect('Orders:HomePage')
@@ -126,29 +127,35 @@ def Remove_single_item_from_cart(request,slug):
         order=order_qs[0]
         if order.items.filter(item__slug=item.slug).exists():
             order_item=OrderItem.objects.filter(item=item,user=request.user,ordered=False)[0]
-            print(order_item)
-            order_item.quantity -=1
-            order_item.save()
-            save_amount=order_item.get_amount_save()
-            print(save_amount)
-            final_price=order_item.get_final_price()
-            order_total=order_qs.first().get_total()
-            print(order_total)
+            if order_item.quantity >1:
+               order_item.quantity -=1
+               order_item.save()
+               save_amount = order_item.get_amount_save()
+               final_price = order_item.get_final_price()
+               order_total = order_qs.first().get_total()
+               return JsonResponse({
+                   'response': 'remove',
+                   'quantity': order_item.quantity,
+                   'save_amount': save_amount,
+                   'final_price': final_price,
+                   'order_total': order_total
+               })
+            else:
+                order.items.remove(order_item)
+                return  JsonResponse({
+                    'response':'ItemRemoved'
+                })
 
-            return JsonResponse({
-                'response':'remove',
-                'quantity':order_item.quantity,
-                'save_amount':save_amount,
-                'final_price':final_price,
-                'order_total':order_total
-            })
-        else:
-            return JsonResponse({
-                'response': 'empty'
-            })
-    return JsonResponse({
-        'response':'empty'
-    })
+
+
+
+    #     else:
+    #         return JsonResponse({
+    #             'response': 'empty'
+    #         })
+    # return JsonResponse({
+    #     'response':'empty'
+    # })
 
 @login_required(redirect_field_name=None)
 def add_single_item_cart(request,slug):
@@ -158,6 +165,51 @@ def add_single_item_cart(request,slug):
        order_item=OrderItem.objects.filter(item=item,user=request.user,ordered=False).first()
        order_item.quantity+=1
        order_item.save()
-       return JsonResponse({'response':'success'})
-    else:
-        return  JsonResponse({'response':'empty'})
+       save_amount = order_item.get_amount_save()
+       final_price = order_item.get_final_price()
+       order_total = order.first().get_total()
+       return JsonResponse(
+           {
+               'response':'success',
+               'quantity':order_item.quantity,
+               'save_amount': save_amount,
+               'final_price': final_price,
+               'order_total': order_total
+
+            })
+
+
+class CheckOutView(LoginRequiredMixin,View):
+    def get(self,*args,**kwargs):
+        form = CheckOutForm()
+        return  render(self.request,'orders/CheckOut.html',{'form':form})
+
+    def post(self,*args,**kwargs):
+        form=CheckOutForm(self.request.POST or None)
+        try:
+            order=Order.objects.filter(user=self.request.user,ordered=False)
+            if form.is_valid():
+                street_address = form.cleaned_data.get('street_address')
+                apartemant_address = form.cleaned_data.get('apartemant_address')
+                country = form.cleaned_data.get('country')
+                zip_cod = form.cleaned_data.get('zip_cod')
+                # same_shipping_address = form.cleaned_data.get('same_shipping_address')
+                # save_info = form.cleaned_data.get(' save_info')
+                # payment_option = form.cleaned_data.get('payment_option')
+                billding_address = BilldingAddress(user=self.request.user,
+                           street_address=street_address, apartemant_address=apartemant_address,
+                           country=country, zip_cod=zip_cod,)
+                billding_address.save()
+                order.billding_address=billding_address
+
+                return JsonResponse({
+                    'response':'ok'
+                })
+
+
+        except ObjectDoesNotExist:
+            return redirect('Orders:HomePage')
+
+
+
+        return render(self.request, 'orders/CheckOut.html', {'form': form})
