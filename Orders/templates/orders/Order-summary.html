@@ -1,7 +1,7 @@
 {% extends 'Base.html' %}
 {% load static %}
 {% block content %}
-    <div class="container-fluid pt-5">
+    <div class="container-fluid pt-5" >
     <h2 style="margin-left: 350px;">OrderSummary</h2>
         <div class="row px-xl-5">
             <div class="col-lg-8 table-responsive mb-5">
@@ -32,12 +32,11 @@
                             <td class="align-middle">
                                 <div class="input-group quantity mx-auto" style="width: 100px;">
                                     <div class="input-group-btn">
-
                                         <a href="{% url 'Orders:remove-single-item' order_item.item.slug %}" data-slug="{{ order_item.item.slug }}" class="btn btn-sm btn-primary btn-minus" id="cart-mines">
                                         <i class="fa fa-minus"></i>
                                         </a>
                                     </div>
-                                    <input type="text" id="input-id" min="1" max="20" class="form-control form-control-sm bg-secondary text-center" value="{{ order_item.quantity }}">
+                                    <input type="text" id="input-id" min="1" max="10" class="form-control form-control-sm bg-secondary text-center" value="{{ order_item.quantity }}">
                                     <div class="input-group-btn">
                                         <a href="{% url 'Orders:add-single-item' order_item.item.slug %}" data-slug="{{ order_item.item.slug }}"  class="btn btn-sm btn-primary btn-plus" id="cart-plus">
                                             <i class="fa fa-plus"></i>
@@ -60,25 +59,39 @@
                         {% elif order_item.item.discount_price != 0 %}
                       <td class="align-middle bg bg-warning text-white" id='save-amount'> ${{ order_item.get_amount_save }} </td>
                             {% elif order_item.item.price %}
-                             <td class="align-middle bg bg-warning text-white" id='save-amount'> 0$ </td>
+                             <td class="align-middle bg bg-warning text-white" id='save-amount'> 0$
+                              {% endif %}
+
+                             </td>
+
                         </tr>
-                        {% endif %}
+
 
                        {% endfor %}
-                   <tr>
+                   <tr id="remove-cart">
                     <td colspan="4">Order Total</td>
+                     {% if object.get_total != 0 %}
                     <td colspan="4" id="order-total-price">{{ object.get_total }}</td>
+                       {% else %}
+                         <td colspan="4" class="text-danger" id="order-total-price" >you dont have item in your cart</td>
+                       {% endif %}
                    </tr>
-                    {% if object.get_total  %}
+
                     <tr>
+                        {% if object.get_total != 0  %}
                         <td colspan="12">
                         <a href="" class="btn btn-warning float-right ml-2"> Proceed to check out</a>
-                        <a href="" class="btn btn-secondary float-right"> Continue Shopping</a>
+
+                        {% else %}
+                            <tr>
+                            <td colspan="12">
+                                <a href="{% url 'Orders:HomePage' %}" class="btn btn-secondary float-right"> Continue Shopping</a>
+                            </td>
+                            </tr>
                         </td>
+                        {% endif %}
                     </tr>
-                    {% else %}
-                    <p> you dont have any order</p>
-                    {% endif %}
+
                     </tbody>
                 </table>
             </div>
