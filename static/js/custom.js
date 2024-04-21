@@ -180,8 +180,10 @@ $(document).ready(function(){
                  console.log($('#order-total-price').text(res.order_total))
                 
             }
+            else if(res.response === 'ItemRemoved'){
+                window.location.href='/order-summary/'
+            }
         })
-
         })
 })
 
@@ -201,3 +203,29 @@ $(document).ready(function (){
         })
     })
 })
+$(document).ready(function () {
+    $('#checkout-form').submit(function (event) {
+        event.preventDefault();
+        var street_address = $('#street_address').val();
+        var apartemant_address = $('#apartemant_address').val();
+        var zip_code = $('#zip_cod').val();
+        var formData = $(this).serialize();
+        if (street_address === '' || apartemant_address === '' || zip_code === '') {
+            Swal.fire({
+                icon: "warning",
+                title: "Fill The Fields",
+                text: "Please fill all the required fields.",
+            });
+        } else {
+            $.post('/checkout/', formData)
+                .done(function (res) {
+                    if (res.response === 'ok') {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Information saved",
+                        });
+                    }
+                })
+        }
+    });
+});

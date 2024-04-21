@@ -80,7 +80,7 @@
                     <tr>
                         {% if object.get_total != 0  %}
                         <td colspan="12">
-                        <a href="" class="btn btn-warning float-right ml-2"> Proceed to check out</a>
+                        <a href="{% url 'Orders:check-out' %}" class="btn btn-warning float-right ml-2"> Proceed to check out</a>
 
                         {% else %}
                             <tr>
