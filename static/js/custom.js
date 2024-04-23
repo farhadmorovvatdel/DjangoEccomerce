@@ -160,7 +160,9 @@ $(document).ready(function(){
                 $('#input-id').val(res.quantity)
                  $('#save-amount').text( '$'+res.save_amount )
                  $('#get-total-price').text(res.final_price)
-                 console.log($('#order-total-price').text(res.order_total))
+                 $('#order-total-price').text(res.order_total)
+                 $('#price').text(res.order_total)
+
 
             }
         })
@@ -177,8 +179,10 @@ $(document).ready(function(){
                  $('#input-id').val(res.quantity)
                  $('#save-amount').text( '$'+res.save_amount )
                  $('#get-total-price').text(res.final_price)
-                 console.log($('#order-total-price').text(res.order_total))
-                
+                 $('#order-total-price').text(res.order_total)
+                 $('#price').text(res.order_total)
+
+
             }
             else if(res.response === 'ItemRemoved'){
                 window.location.href='/order-summary/'
@@ -216,7 +220,8 @@ $(document).ready(function () {
                 title: "Fill The Fields",
                 text: "Please fill all the required fields.",
             });
-        } else {
+        }
+        else {
             $.post('/checkout/', formData)
                 .done(function (res) {
                     if (res.response === 'ok') {
@@ -226,6 +231,35 @@ $(document).ready(function () {
                         });
                     }
                 })
+
         }
     });
 });
+$(document).ready(function (){
+    $('#form-coupon').on('submit',function (event){
+        event.preventDefault()
+        var formdata=$(this).serialize()
+        $.post('/coupon/',formdata).done(function (res){
+            if(res.response ==='already'){
+               Swal.fire({
+                            icon: "warning",
+                            title: "You already Use this Coupon",
+                        });
+            }
+            else if(res.response === 'NotValid'){
+                 Swal.fire({
+                            icon: "warning",
+                            title: "This cod Not Correct",
+                        });
+            }
+            else if(res.response === 'Valid'){
+                    $('#price').text(res.final_price)
+                    $('#order-total-price').text(res.final_price)
+            }
+        })
+    })
+})
+
+
+
+
