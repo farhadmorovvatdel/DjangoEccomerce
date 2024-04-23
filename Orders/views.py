@@ -2,11 +2,12 @@ from django.contrib.auth.decorators import login_required
 from  django.contrib.auth .mixins import LoginRequiredMixin
 from django.shortcuts import render,get_object_or_404,redirect
 from django.views.generic import  ListView,DetailView,View
-from .models import Item,OrderItem,Order,BilldingAddress
+from .models import Item,OrderItem,Order,BilldingAddress,OrderDiscount,DiscountCode
 from django.utils import  timezone
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from .forms import CheckOutForm
+
 
 class HomeListView(ListView):
     model = Item
@@ -133,6 +134,7 @@ def Remove_single_item_from_cart(request,slug):
                save_amount = order_item.get_amount_save()
                final_price = order_item.get_final_price()
                order_total = order_qs.first().get_total()
+
                return JsonResponse({
                    'response': 'remove',
                    'quantity': order_item.quantity,
@@ -142,6 +144,7 @@ def Remove_single_item_from_cart(request,slug):
                })
             else:
                 order.items.remove(order_item)
+
                 return  JsonResponse({
                     'response':'ItemRemoved'
                 })
@@ -213,6 +216,37 @@ class CheckOutView(LoginRequiredMixin,View):
         except ObjectDoesNotExist:
             return redirect('Orders:HomePage')
 
-
-
         return render(self.request, 'orders/CheckOut.html', {'form': form})
+
+
+
+class CouponView(View):
+
+    def post(self,request,*args,**kwargs):
+        cod_copon=self.request.POST.get('code-coupon')
+        copon=DiscountCode.objects.filter(code__exact=cod_copon).first()
+        order=Order.objects.filter(user=request.user,ordered=False).first()
+        if copon and order:
+            discount=OrderDiscount.objects.filter(order=order,discount_code=copon)
+            if discount.exists():
+                return  JsonResponse({'response':"already"})
+            else:
+                discount=OrderDiscount.objects.create(order=order,discount_code=copon).save()
+                final_price=order.after_dicount()
+
+
+                return  JsonResponse({'response':'Valid',
+                                      'final_price':final_price})
+        else:
+            return  JsonResponse({
+                'response':'NotValid'
+            })
+
+
+
+
+
+
+
+
+

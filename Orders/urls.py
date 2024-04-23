@@ -2,7 +2,8 @@ from django.urls import path
 from .views import HomeListView,ItemDetailView,\
     Add_to_Cart,Remove_from_cart,Order_Summary\
     ,cart_item_count,Faviorate_Item,Remove_single_item_from_cart,\
-    add_single_item_cart,CheckOutView
+    add_single_item_cart,CheckOutView,CouponView
+
 app_name='Orders'
 urlpatterns=[
     path('',HomeListView.as_view(),name='HomePage'),
@@ -15,6 +16,9 @@ urlpatterns=[
     path('remove-single-item-from-cart/<slug>',Remove_single_item_from_cart,name='remove-single-item'),
     path('add-single-item-to-cart/<slug>',add_single_item_cart,name='add-single-item'),
     path('checkout/',CheckOutView.as_view(),name='check-out'),
+    path('coupon/',CouponView.as_view(),name='Coupon'),
+
+
 
 
 ]
