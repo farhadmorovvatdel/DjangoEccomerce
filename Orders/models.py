@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.shortcuts import reverse
 from django_countries.fields import CountryField
-
+from django.utils import  timezone
 
 CATEGORY_CHOICES=(
     ( 'S','Shirt'),
@@ -23,6 +23,7 @@ class Item(models.Model):
     slug=models.SlugField()
     description=models.TextField(null=True,blank=True)
     quantity=models.PositiveIntegerField(default=1)
+    image=models.ImageField()
     def __str__(self):
         return self.title
     def get_asbolute_url(self):
@@ -70,6 +71,7 @@ class Order(models.Model):
     orderd_date=models.DateTimeField()
     ordered = models.BooleanField(default=False)
     billding_address=models.ForeignKey('BilldingAddress',on_delete=models.SET_NULL,null=True,blank=True)
+
     def __str__(self):
         return self.user.username
 
@@ -77,8 +79,21 @@ class Order(models.Model):
         total=0
         for order_item in self.items.all():
             total+=order_item.get_final_price()
+        order_discounts = OrderDiscount.objects.filter(order=self)
+        for order_discount in order_discounts:
+            total -= float(order_discount.discount_code.discount_price)
+            if total <=0:
+                total=0
         return  total
-       
+    def after_dicount(self):
+        total=self.get_total()
+        order_discounts = OrderDiscount.objects.filter(order=self)
+        for order_discount in order_discounts:
+            total -= float(order_discount.discount_code.discount_price)
+            if total<=0:
+                total=0
+                return total
+        return total
 class BilldingAddress(models.Model):
     user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     street_address=models.CharField(max_length=100)
@@ -87,3 +102,31 @@ class BilldingAddress(models.Model):
     zip_cod=models.CharField(max_length=100)
     def __str__(self):
         return  self.user.username
+
+class DiscountCode(models.Model):
+    code = models.CharField(max_length=50, unique=True)
+    discount_price = models.DecimalField(max_digits=10, decimal_places=2,default=0)
+    def __str__(self):
+        return self.code
+
+
+
+class OrderDiscount(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    discount_code = models.ForeignKey(DiscountCode, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('order', 'discount_code')
+
+    def __str__(self):
+        return f'{self.order.user, self.discount_code.code}'
+
+
+
+
+
+
+
+
+
+
