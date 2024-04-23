@@ -39,6 +39,20 @@ class Item(models.Model):
             'slug':self.slug
         })
 
+
+
+
+class Gallery(models.Model):
+    item=models.ForeignKey(Item,on_delete=models.CASCADE)
+    image=models.ImageField(upload_to='item_images')
+    description=models.CharField(max_length=200,null=True,blank=True)
+    def __str__(self):
+        return f'Image of {self.item.title}'
+
+
+
+
+
 class OrderItem(models.Model):
     item=models.ForeignKey(Item,on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
