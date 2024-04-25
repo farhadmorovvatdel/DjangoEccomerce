@@ -4,9 +4,29 @@ from django.shortcuts import render,get_object_or_404,redirect
 from django.views.generic import  ListView,DetailView,View
 from .models import Item,OrderItem,Order,BilldingAddress,OrderDiscount,DiscountCode
 from django.utils import  timezone
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from .forms import CheckOutForm
+from .models import Like ,Dislike
+from django.views.decorators.http import require_POST
+from django.contrib.contenttypes.models import ContentType
+
+
+
+
+
+
+
+
+def Header(request):
+    if request.user.is_authenticated:
+      qs = Order.objects.filter(user=request.user,ordered=False)
+      if qs.exists():
+        item_count=qs.first().items.count()
+        return render(request,'header.html',{'item_count':item_count})
+      else:
+          return render(request,'header.html',{'item_count':0})
+    return  render(request,'header.html')
 
 
 class HomeListView(ListView):
@@ -17,10 +37,17 @@ class HomeListView(ListView):
 class ItemDetailView(DetailView):
     template_name = 'orders/Product.html'
     model = Item
-    def get_context_data(self,**kwargs):
+    def get_context_data(self,*args,**kwargs):
         request=self.request
+        item=self.object
+        user=self.request.user
         context=super(ItemDetailView,self).get_context_data(**kwargs)
         context['is_authenticated']=request.user.is_authenticated
+        context['likecount']=item.likes.count()
+        context['dislikecount']=item.dislikes.count()
+        context['exists_like']=Like.objects.filter(user=user,content_type=ContentType.objects.get_for_model(item),object_id=item.id).exists()
+        context['exist_unlike'] = Dislike.objects.filter(user=user, content_type=ContentType.objects.get_for_model(item)
+                                              , object_id=item.id).exists()
         return context
 
 
@@ -50,15 +77,7 @@ def Add_to_Cart(request,slug):
                'response': 'success'
           })
 
-def Header(request):
-    if request.user.is_authenticated:
-      qs = Order.objects.filter(user=request.user,ordered=False)
-      if qs.exists():
-        item_count=qs.first().items.count()
-        return render(request,'header.html',{'item_count':item_count})
-      else:
-          return render(request,'header.html',{'item_count':0})
-    return  render(request,'header.html')
+
 
 @login_required(redirect_field_name=None)
 def Remove_from_cart(request,slug):
@@ -118,8 +137,28 @@ def Faviorate_Item(request,id):
 
     return JsonResponse({'faviorate':faviorate})
 
+def LikeView(request,Item_id):
+    item=get_object_or_404(Item,pk=Item_id)
+    user=request.user
+    exist_like=Like.objects.filter(user=user,content_type=ContentType.objects.get_for_model(item)
+                           ,object_id=item.id).first()
+    if exist_like:
+        exist_like.unlike()
+        return JsonResponse({'reponse':'you unlike the item'})
 
+    like = Like.objects.create(user=user,content_object=item)
+    return  JsonResponse({'repoonse':'you like'})
 
+def DisLikeView(request,Item_id):
+    item=get_object_or_404(Item,pk=Item_id)
+    user=request.user
+    exist_unlike=Dislike.objects.filter(user=user,content_type=ContentType.objects.get_for_model(item)
+            ,object_id=item.id).first()
+    if exist_unlike:
+        exist_unlike.RemoveThislike()
+        return JsonResponse({'response': 'you removedislike alreay'})
+    dislike = Dislike.objects.create(user=user,content_object=item)
+    return JsonResponse({'repoonse': 'you dislike'})
 @login_required(redirect_field_name=None)
 def Remove_single_item_from_cart(request,slug):
     item=get_object_or_404(Item,slug=slug)
