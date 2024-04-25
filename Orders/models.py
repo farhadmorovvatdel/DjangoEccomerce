@@ -2,7 +2,9 @@ from django.db import models
 from django.conf import settings
 from django.shortcuts import reverse
 from django_countries.fields import CountryField
-from django.utils import  timezone
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
 
 CATEGORY_CHOICES=(
     ( 'S','Shirt'),
@@ -20,10 +22,13 @@ class Item(models.Model):
     discount_price=models.FloatField(null= True,blank=True)
     category=models.CharField(choices=CATEGORY_CHOICES,max_length=20,default='S')
     label=models.CharField(choices=LABEL_CHOICES,max_length=20,default="Su")
-    slug=models.SlugField()
+    slug=models.SlugField(unique=True)
     description=models.TextField(null=True,blank=True)
     quantity=models.PositiveIntegerField(default=1)
     image=models.ImageField()
+    likes = GenericRelation('Like')
+    dislikes = GenericRelation('Dislike')
+
     def __str__(self):
         return self.title
     def get_asbolute_url(self):
@@ -134,6 +139,36 @@ class OrderDiscount(models.Model):
 
     def __str__(self):
         return f'{self.order.user, self.discount_code.code}'
+
+
+
+
+class Like(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    def __str__(self):
+         return f'{self.content_object} - {self.object_id}'
+
+    def unlike(self):
+        return  self.delete()
+
+class Dislike(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    def __str__(self):
+        return f'{self.content_object}- {self.object_id}'
+    def RemoveThislike(self):
+        return  self.delete()
+
+
+
 
 
 
