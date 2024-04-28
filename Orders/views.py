@@ -11,13 +11,6 @@ from .models import Like ,Dislike
 from django.views.decorators.http import require_POST
 from django.contrib.contenttypes.models import ContentType
 
-
-
-
-
-
-
-
 def Header(request):
     if request.user.is_authenticated:
       qs = Order.objects.filter(user=request.user,ordered=False)
@@ -37,17 +30,20 @@ class HomeListView(ListView):
 class ItemDetailView(DetailView):
     template_name = 'orders/Product.html'
     model = Item
+
     def get_context_data(self,*args,**kwargs):
         request=self.request
         item=self.object
         user=self.request.user
         context=super(ItemDetailView,self).get_context_data(**kwargs)
-        context['is_authenticated']=request.user.is_authenticated
+        context['is_authenticated']=user.is_authenticated
         context['likecount']=item.likes.count()
         context['dislikecount']=item.dislikes.count()
-        context['exists_like']=Like.objects.filter(user=user,content_type=ContentType.objects.get_for_model(item),object_id=item.id).exists()
-        context['exist_unlike'] = Dislike.objects.filter(user=user, content_type=ContentType.objects.get_for_model(item)
-                                              , object_id=item.id).exists()
+        if user.is_authenticated:
+            user = self.request.user
+            context['exists_like'] = item.likes.filter(user=user).exists()
+            context['exist_unlike'] = item.dislikes.filter(user=user).exists()
+
         return context
 
 
